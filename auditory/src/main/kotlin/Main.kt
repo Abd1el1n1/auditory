@@ -1,18 +1,21 @@
 fun main() {
-    val previousUser = mapOf(
-        "firstName" to "James",
-        "subscription" to mapOf("status" to "ACTIVE"),
-        "services" to listOf("Oil Change", "Tire Rotation"),
-        "vehicles" to listOf(mapOf("displayName" to "My Car", "id" to "v_1"))
-    )
+    val previousPerson = Person("James", "Smith", 25, listOf("Oil Change", "Interior/Exterior Wash"))
+    val currentPerson = Person("Jim", "Smith", 26, listOf("Oil Change"))
 
-    val currentUser = mapOf(
-        "firstName" to "Jim",
-        "subscription" to mapOf("status" to "EXPIRED"),
-        "services" to listOf("Oil Change", "Alignment"),
-        "vehicles" to listOf(mapOf("displayName" to "23 Ferrari 296 GTS", "id" to "v_1"))
-    )
+    val previousSubscription = Subscription("ACTIVE")
+    val currentSubscription = Subscription("EXPIRED")
 
-    val auditInfo = AuditSystem.compare(previousUser, currentUser)
-    println(auditInfo)
+    val previousUser = User("u_1", "John Doe", previousSubscription, listOf(previousPerson))
+    val currentUser = User("u_1", "John Doe", currentSubscription, listOf(currentPerson))
+
+    val diffTool = DiffTool()
+    val changes = diffTool.diff(previousUser, currentUser)
+
+    changes.forEach {
+        when (it) {
+            is ChangeType.PropertyUpdate -> println("Property: ${it.property}, Previous: ${it.previous}, Current: ${it.current}")
+            is ChangeType.ListUpdate -> println("Property: ${it.property}, Added: ${it.added}, Removed: ${it.removed}")
+        }
+    }
 }
+
